@@ -1,3 +1,4 @@
+import { CatsService } from './cat.service';
 import {
   Body,
   Controller,
@@ -13,17 +14,20 @@ import {
   UpdateCatDto,
   ListAllEntities,
 } from './dto/create-cat.dto';
+import { Cat } from './interfaces/cat.interface';
 
 @Controller('cats')
-export class CatController {
+export class CatsController {
+  constructor(private catsService: CatsService) {}
+
   @Post()
   create(@Body() createCatDto: CreateCatDto) {
-    return 'This action adds a new cat';
+    this.catsService.create(createCatDto);
   }
 
   @Get()
-  findAll(@Query() query: ListAllEntities) {
-    return `This action returns all cats (limit: ${query.limit} items)`;
+  findAll(): Promise<Cat[]> {
+    return this.catsService.findAll();
   }
 
   @Get(':id')
