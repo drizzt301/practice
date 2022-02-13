@@ -1,5 +1,3 @@
-
-/*
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import dotenv from 'dotenv';
 
@@ -22,4 +20,3 @@ const config: TypeOrmModuleOptions = {
 };
 
 export = config;
-*/
