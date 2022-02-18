@@ -1,13 +1,13 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateBannerDto {
+export class CreateContentDto {
   @IsNotEmpty()
   @IsString()
-  readonly name: string;
+  readonly title: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly description: string;
+  readonly content: string;
 
   @IsNotEmpty()
   @IsString()

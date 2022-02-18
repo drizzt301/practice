@@ -12,6 +12,8 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as ormconfig from '../ormconfig';
 import { ConfigModule } from '@nestjs/config';
+import { TestAppModule } from './test-app/test-app.module';
+import { ContentsModule } from './contents/contents.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { ConfigModule } from '@nestjs/config';
     OrdersModule,
     AddressesModule,
     ReviewsModule,
+    TestAppModule,
+    ContentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

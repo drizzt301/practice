@@ -19,8 +19,12 @@ export class Banner {
 
   // @Column('character varying', { name: 'test', length: 100 })
   // test: string;
-
-  @Column('character varying', { name: 'name', nullable: true, length: 50 })
+  @Column('character varying', {
+    name: 'name',
+    nullable: true,
+    length: 50,
+    unique: true,
+  })
   name: string | null;
 
   @Column('character varying', {
