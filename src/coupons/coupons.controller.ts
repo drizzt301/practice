@@ -15,47 +15,47 @@ import { Users } from 'src/entities/Users';
 import { CouponStatus } from './coupon-status.enum';
 import { CouponsService } from './coupons.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
-import { CouponStatusValidationPipe } from './pipes/coupon-status-validation.pipe';
+import { UpdateCouponDto } from './dto/update-coupon.dto';
 
 @Controller('coupons')
 export class CouponsController {
-  private logger = new Logger('Boards');
+  private logger = new Logger('Coupons');
   constructor(private couponsService: CouponsService) {}
 
   @Get()
-  getAllBoard(): Promise<Coupon[]> {
+  findAll(): Promise<Coupon[]> {
     this.logger.verbose(`User trying to get all coupons`);
-    return this.couponsService.getAllCoupons();
+    return this.couponsService.findAll();
   }
 
   @Post()
-  @UsePipes(CouponStatusValidationPipe)
   createCoupon(@Body() createCouponDto: CreateCouponDto): Promise<Coupon> {
     // @GetUser() user:User
-    this.logger.verbose(`User creating a new board. 
+    this.logger.verbose(`User creating a new coupon. 
       Payload: ${JSON.stringify(createCouponDto)} `); // ${user.username}
-    return this.couponsService.createCoupon(createCouponDto); //, user
+    return this.couponsService.create(createCouponDto); //, user
   }
 
   @Get('/:id')
-  getCouponById(@Param('id') id: number): Promise<Coupon> {
-    return this.couponsService.getCouponById(id);
+  findOne(@Param('id') id: number): Promise<Coupon> {
+    return this.couponsService.findOne(id);
   }
 
   @Delete('/:id')
-  deleteCoupon(
+  delete(
     @Param('id', ParseIntPipe) id,
     //@GetUser() user:User
   ): Promise<void> {
-    return this.couponsService.deleteCoupon(id); // , user
+    return this.couponsService.delete(id); // , user
   }
 
-  @Patch('/:id/status')
-  updateBoardStatus(
+  @Patch('/:id')
+  update(
     @Param('id', ParseIntPipe) id: number,
-    @Body('status', CouponStatusValidationPipe) status: CouponStatus,
-  ) {
-    return this.couponsService.updateBoardStatus(id); // , status
+    @Body() updateCouponDto: UpdateCouponDto,
+  ): Promise<Coupon> {
+    return this.couponsService.update(id, updateCouponDto);
+    // , status
   }
 }
 

@@ -1,9 +1,24 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateAddressDto {
   @IsNotEmpty()
-  streetAddress: string;
+  @IsString()
+  readonly streetAddress: string;
 
   @IsNotEmpty()
-  apartmentAddress: string;
+  @IsString()
+  readonly apartmentAddress: string;
+
+  @IsString()
+  readonly etc: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly name: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly zip: string;
 }
+
+/* 글자수 지정도 가능*/

@@ -15,56 +15,45 @@ import { Users } from 'src/entities/Users';
 import { ProductStatus } from './product-status.enum';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductStatusValidationPipe } from './pipes/product-status-validation.pipe';
 
 @Controller('products')
 export class ProductsController {
-  private logger = new Logger('Boards');
+  private logger = new Logger('Products');
   constructor(private productsService: ProductsService) {}
 
-  @Get()
-  getAllBoard(): Promise<Product[]> {
-    this.logger.verbose(`User trying to get all products`);
-    return this.productsService.getAllProducts();
+  @Post()
+  create(@Body() createProductDto: CreateProductDto): Promise<Product> {
+    return this.productsService.create(createProductDto);
   }
 
-  @Post()
-  @UsePipes(ProductStatusValidationPipe)
-  createProduct(@Body() createProductDto: CreateProductDto): Promise<Product> {
-    // @GetUser() user:User
-    this.logger.verbose(`User creating a new board. 
-      Payload: ${JSON.stringify(createProductDto)} `); // ${user.username}
-    return this.productsService.createProduct(createProductDto); //, user
+  @Get()
+  findAll(): Promise<Product[]> {
+    this.logger.verbose(`User trying to get all products`);
+    return this.productsService.findAll();
   }
 
   @Get('/:id')
-  getProductById(@Param('id') id: number): Promise<Product> {
-    return this.productsService.getProductById(id);
+  findOne(@Param('id') id: number): Promise<Product> {
+    return this.productsService.findOne(id);
+  }
+
+  @Patch('/:id')
+  update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    console.log(typeof id);
+    // console.log('controller : ' + updateProductDto);
+    return this.productsService.update(+id, updateProductDto);
   }
 
   @Delete('/:id')
-  deleteProduct(
+  delete(
     @Param('id', ParseIntPipe) id,
     //@GetUser() user:User
   ): Promise<void> {
-    return this.productsService.deleteProduct(id); // , user
-  }
-
-  @Patch('/:id/status')
-  updateBoardStatus(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('status', ProductStatusValidationPipe) status: ProductStatus,
-  ) {
-    return this.productsService.updateBoardStatus(id); // , status
+    return this.productsService.delete(id); // , user
   }
 }
-
-/*
-  @Get()
-  getAllBoard(@GetUser() user: Users): Promise<Product[]> {
-    this.logger.verbose(
-      `User ${user.firstName} ${user.lastName} trying to get all products`,
-    );
-    return this.boardsService.getAllProducts(user);
-  }
-*/

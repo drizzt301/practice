@@ -30,10 +30,10 @@ export class Review {
   @Column('integer', { name: 'users_id' })
   usersId: number;
 
-  @Column('integer', { name: 'product_id' })
+  @Column('integer', { name: 'product_id', nullable: true })
   productId: number;
 
-  @Column('integer', { name: 'order_id' })
+  @Column('integer', { name: 'order_id', nullable: true })
   orderId: number;
 
   @CreateDateColumn()

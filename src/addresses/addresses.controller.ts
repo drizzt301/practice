@@ -16,10 +16,11 @@ import { AddressStatus } from './address-status.enum';
 import { AddressesService } from './addresses.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { AddressStatusValidationPipe } from './pipes/address-status-validation.pipe';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('addresses')
 export class AddressesController {
-  private logger = new Logger('Boards');
+  private logger = new Logger('Addresses');
   constructor(private addressesService: AddressesService) {}
 
   @Get()
@@ -29,17 +30,17 @@ export class AddressesController {
   }
 
   @Post()
-  @UsePipes(AddressStatusValidationPipe)
+  //@UsePipes(AddressStatusValidationPipe)
   createAddress(@Body() createAddressDto: CreateAddressDto): Promise<Address> {
     // @GetUser() user:User
-    this.logger.verbose(`User creating a new board. 
+    this.logger.verbose(`User creating a new address. 
       Payload: ${JSON.stringify(createAddressDto)} `); // ${user.username}
     return this.addressesService.createAddress(createAddressDto); //, user
   }
 
   @Get('/:id')
   getAddressById(@Param('id') id: number): Promise<Address> {
-    return this.addressesService.getAddressById(id);
+    return this.addressesService.findOne(id);
   }
 
   @Delete('/:id')
@@ -50,12 +51,12 @@ export class AddressesController {
     return this.addressesService.deleteAddress(id); // , user
   }
 
-  @Patch('/:id/status')
-  updateBoardStatus(
+  @Patch('/:id')
+  update(
     @Param('id', ParseIntPipe) id: number,
-    @Body('status', AddressStatusValidationPipe) status: AddressStatus,
-  ) {
-    return this.addressesService.updateBoardStatus(id); // , status
+    @Body() updateAddressDto: UpdateAddressDto,
+  ): Promise<Address> {
+    return this.addressesService.update(id, updateAddressDto);
   }
 }
 

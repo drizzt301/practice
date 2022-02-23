@@ -1,30 +1,33 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Coupon } from 'src/entities/Coupon';
-import { CouponRepository } from './coupon.repository';
+import { Repository } from 'typeorm';
 import { CreateCouponDto } from './dto/create-coupon.dto';
+import { UpdateCouponDto } from './dto/update-coupon.dto';
 
 @Injectable()
 export class CouponsService {
   constructor(
-    @InjectRepository(CouponRepository)
-    private couponRepository: CouponRepository,
+    @InjectRepository(Coupon)
+    private couponRepository: Repository<Coupon>,
   ) {}
 
-  async getAllCoupons(): Promise<Coupon[]> {
-    const query = this.couponRepository.createQueryBuilder('coupon');
-    //query.where('board.userId = :userId', { userId: user.id });
-    const coupons = await query.getMany();
-
-    return coupons;
+  findAll(): Promise<Coupon[]> {
+    return this.couponRepository.find();
   }
 
-  createCoupon(createCouponDto: CreateCouponDto): Promise<Coupon> {
+  async create(createCouponDto: CreateCouponDto): Promise<Coupon> {
     // , user: User
-    return this.couponRepository.createCoupon(createCouponDto); // , user
+    const { code, name } = createCouponDto;
+    const coupon = this.couponRepository.create({
+      code,
+      name,
+    });
+    await this.couponRepository.save(coupon);
+    return coupon;
   }
 
-  async getCouponById(id: number): Promise<Coupon> {
+  async findOne(id: number): Promise<Coupon> {
     const found = await this.couponRepository.findOne(id);
 
     if (!found) {
@@ -34,7 +37,7 @@ export class CouponsService {
     return found;
   }
 
-  async deleteCoupon(id: number): Promise<void> {
+  async delete(id: number): Promise<void> {
     // , user: User
     const result = await this.couponRepository.delete({ id }); // , user
 
@@ -43,13 +46,16 @@ export class CouponsService {
     }
   }
 
-  async updateBoardStatus(id: number): Promise<Coupon> {
-    //, status: CouponStatus
-    const coupon = await this.getCouponById(id);
+  async update(id: number, updateCouponDto: UpdateCouponDto): Promise<Coupon> {
+    const coupon = await this.findOne(id);
 
-    //coupon.status = status;
+    console.log(typeof id);
+
+    const { code, name } = updateCouponDto;
+    coupon.code = code;
+    coupon.name = name;
+
     await this.couponRepository.save(coupon);
-
     return coupon;
   }
 }

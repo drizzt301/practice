@@ -13,7 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as ormconfig from '../ormconfig';
 import { ConfigModule } from '@nestjs/config';
 import { TestAppModule } from './test-app/test-app.module';
-import { ContentsModule } from './contents/contents.module';
+import { ContentModule } from './content/content.module';
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { ContentsModule } from './contents/contents.module';
     AddressesModule,
     ReviewsModule,
     TestAppModule,
-    ContentsModule,
+    ContentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

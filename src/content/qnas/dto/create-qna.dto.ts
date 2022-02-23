@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateContentDto {
+export class CreateQnaDto {
   @IsNotEmpty()
   @IsString()
   readonly title: string;

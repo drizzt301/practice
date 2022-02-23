@@ -15,56 +15,45 @@ import { Users } from 'src/entities/Users';
 import { OrderStatus } from './order-status.enum';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderStatusValidationPipe } from './pipes/order-status-validation.pipe';
 
 @Controller('orders')
 export class OrdersController {
-  private logger = new Logger('Boards');
+  private logger = new Logger('Orders');
   constructor(private ordersService: OrdersService) {}
 
-  @Get()
-  getAllBoard(): Promise<Order[]> {
-    this.logger.verbose(`User trying to get all orders`);
-    return this.ordersService.getAllOrders();
+  @Post()
+  create(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
+    return this.ordersService.create(createOrderDto);
   }
 
-  @Post()
-  @UsePipes(OrderStatusValidationPipe)
-  createOrder(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
-    // @GetUser() user:User
-    this.logger.verbose(`User creating a new board. 
-      Payload: ${JSON.stringify(createOrderDto)} `); // ${user.username}
-    return this.ordersService.createOrder(createOrderDto); //, user
+  @Get()
+  findAll(): Promise<Order[]> {
+    this.logger.verbose(`User trying to get all orders`);
+    return this.ordersService.findAll();
   }
 
   @Get('/:id')
-  getOrderById(@Param('id') id: number): Promise<Order> {
-    return this.ordersService.getOrderById(id);
+  findOne(@Param('id') id: number): Promise<Order> {
+    return this.ordersService.findOne(id);
+  }
+
+  @Patch('/:id')
+  update(
+    @Param('id') id: string,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ): Promise<Order> {
+    console.log(typeof id);
+    // console.log('controller : ' + updateOrderDto);
+    return this.ordersService.update(+id, updateOrderDto);
   }
 
   @Delete('/:id')
-  deleteOrder(
+  delete(
     @Param('id', ParseIntPipe) id,
     //@GetUser() user:User
   ): Promise<void> {
-    return this.ordersService.deleteOrder(id); // , user
-  }
-
-  @Patch('/:id/status')
-  updateBoardStatus(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('status', OrderStatusValidationPipe) status: OrderStatus,
-  ) {
-    return this.ordersService.updateBoardStatus(id); // , status
+    return this.ordersService.delete(id); // , user
   }
 }
-
-/*
-  @Get()
-  getAllBoard(@GetUser() user: Users): Promise<Order[]> {
-    this.logger.verbose(
-      `User ${user.firstName} ${user.lastName} trying to get all orders`,
-    );
-    return this.boardsService.getAllOrders(user);
-  }
-*/

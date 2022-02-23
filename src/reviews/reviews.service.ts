@@ -1,55 +1,59 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from 'src/entities/Review';
-import { ReviewRepository } from './review.repository';
+import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
 export class ReviewsService {
   constructor(
-    @InjectRepository(ReviewRepository)
-    private reviewRepository: ReviewRepository,
+    @InjectRepository(Review)
+    private reviewRepository: Repository<Review>,
   ) {}
 
-  async getAllReviews(): Promise<Review[]> {
-    const query = this.reviewRepository.createQueryBuilder('review');
-    //query.where('board.userId = :userId', { userId: user.id });
-    const reviews = await query.getMany();
-
-    return reviews;
+  findAll(): Promise<Review[]> {
+    return this.reviewRepository.find();
   }
 
-  createReview(createReviewDto: CreateReviewDto): Promise<Review> {
-    // , user: User
-    return this.reviewRepository.createReview(createReviewDto); // , user
-  }
-
-  async getReviewById(id: number): Promise<Review> {
+  async findOne(id: number): Promise<Review> {
     const found = await this.reviewRepository.findOne(id);
-
+    //found === null
     if (!found) {
       throw new NotFoundException(`Can't find Review with id ${id}`);
     }
-
     return found;
   }
 
-  async deleteReview(id: number): Promise<void> {
-    // , user: User
-    const result = await this.reviewRepository.delete({ id }); // , user
+  async create(createReviewDto: CreateReviewDto): Promise<Review> {
+    const { title, content, usersId } = createReviewDto;
+    const review = this.reviewRepository.create({
+      title,
+      content,
+      usersId,
+    });
+    await this.reviewRepository.save(review);
+    return review;
+  }
 
+  async delete(id: number): Promise<void> {
+    const result = await this.reviewRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Can't find Review with id ${id}`);
     }
+    console.log(result);
   }
 
-  async updateBoardStatus(id: number): Promise<Review> {
-    //, status: ReviewStatus
-    const review = await this.getReviewById(id);
+  async update(id: number, updateReviewDto: UpdateReviewDto): Promise<Review> {
+    const review = await this.findOne(id);
 
-    //review.status = status;
+    console.log(typeof id);
+
+    const { title, content } = updateReviewDto;
+    review.title = title;
+    review.content = content;
+
     await this.reviewRepository.save(review);
-
     return review;
   }
 }

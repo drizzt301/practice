@@ -1,14 +1,15 @@
+import { UpdateAddressDto } from './dto/update-address.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Address } from 'src/entities/Address';
-import { AddressRepository } from './address.repository';
+import { Repository } from 'typeorm';
 import { CreateAddressDto } from './dto/create-address.dto';
 
 @Injectable()
 export class AddressesService {
   constructor(
-    @InjectRepository(AddressRepository)
-    private addressRepository: AddressRepository,
+    @InjectRepository(Address)
+    private addressRepository: Repository<Address>,
   ) {}
 
   async getAllAddresses(): Promise<Address[]> {
@@ -19,12 +20,22 @@ export class AddressesService {
     return addresses;
   }
 
-  createAddress(createAddressDto: CreateAddressDto): Promise<Address> {
+  async createAddress(createAddressDto: CreateAddressDto): Promise<Address> {
     // , user: User
-    return this.addressRepository.createAddress(createAddressDto); // , user
+    const { streetAddress, apartmentAddress, name, zip, etc } =
+      createAddressDto;
+    const address = this.addressRepository.create({
+      streetAddress,
+      apartmentAddress,
+      name,
+      zip,
+      etc,
+    });
+    await this.addressRepository.save(address);
+    return address;
   }
 
-  async getAddressById(id: number): Promise<Address> {
+  async findOne(id: number): Promise<Address> {
     const found = await this.addressRepository.findOne(id);
 
     if (!found) {
@@ -43,13 +54,23 @@ export class AddressesService {
     }
   }
 
-  async updateBoardStatus(id: number): Promise<Address> {
-    //, status: AddressStatus
-    const address = await this.getAddressById(id);
+  async update(
+    id: number,
+    updateAddressDto: UpdateAddressDto,
+  ): Promise<Address> {
+    const address = await this.findOne(id);
 
-    //address.status = status;
+    console.log(typeof id);
+
+    const { streetAddress, apartmentAddress, name, zip, etc } =
+      updateAddressDto;
+    address.streetAddress = streetAddress;
+    address.apartmentAddress = apartmentAddress;
+    address.name = name;
+    address.zip = zip;
+    address.etc = etc;
+
     await this.addressRepository.save(address);
-
     return address;
   }
 }

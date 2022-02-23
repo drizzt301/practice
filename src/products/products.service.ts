@@ -1,55 +1,65 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/entities/Product';
-import { ProductRepository } from './product.repository';
+import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectRepository(ProductRepository)
-    private productRepository: ProductRepository,
+    @InjectRepository(Product)
+    private productRepository: Repository<Product>,
   ) {}
 
-  async getAllProducts(): Promise<Product[]> {
-    const query = this.productRepository.createQueryBuilder('product');
-    //query.where('board.userId = :userId', { userId: user.id });
-    const products = await query.getMany();
-
-    return products;
+  findAll(): Promise<Product[]> {
+    return this.productRepository.find();
   }
 
-  createProduct(createProductDto: CreateProductDto): Promise<Product> {
-    // , user: User
-    return this.productRepository.createProduct(createProductDto); // , user
-  }
-
-  async getProductById(id: number): Promise<Product> {
+  async findOne(id: number): Promise<Product> {
     const found = await this.productRepository.findOne(id);
-
+    //found === null
     if (!found) {
       throw new NotFoundException(`Can't find Product with id ${id}`);
     }
-
     return found;
   }
 
-  async deleteProduct(id: number): Promise<void> {
-    // , user: User
-    const result = await this.productRepository.delete({ id }); // , user
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+    const { name, description, slug, thumbnail } = createProductDto;
+    const product = this.productRepository.create({
+      name,
+      description,
+      slug,
+      thumbnail,
+    });
+    await this.productRepository.save(product);
+    return product;
+  }
 
+  async delete(id: number): Promise<void> {
+    const result = await this.productRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Can't find Product with id ${id}`);
     }
+    console.log(result);
   }
 
-  async updateBoardStatus(id: number): Promise<Product> {
-    //, status: ProductStatus
-    const product = await this.getProductById(id);
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    const product = await this.findOne(id);
 
-    //product.status = status;
+    console.log(typeof id);
+
+    const { name, description, slug, thumbnail } = updateProductDto;
+    product.name = name;
+    product.description = description;
+    product.slug = slug;
+    product.thumbnail = thumbnail;
+
     await this.productRepository.save(product);
-
     return product;
   }
 }

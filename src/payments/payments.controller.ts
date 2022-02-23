@@ -15,56 +15,45 @@ import { Users } from 'src/entities/Users';
 import { PaymentStatus } from './payment-status.enum';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { PaymentStatusValidationPipe } from './pipes/payment-status-validation.pipe';
 
 @Controller('payments')
 export class PaymentsController {
-  private logger = new Logger('Boards');
+  private logger = new Logger('Payments');
   constructor(private paymentsService: PaymentsService) {}
 
-  @Get()
-  getAllBoard(): Promise<Payment[]> {
-    this.logger.verbose(`User trying to get all payments`);
-    return this.paymentsService.getAllPayments();
+  @Post()
+  create(@Body() createPaymentDto: CreatePaymentDto): Promise<Payment> {
+    return this.paymentsService.create(createPaymentDto);
   }
 
-  @Post()
-  @UsePipes(PaymentStatusValidationPipe)
-  createPayment(@Body() createPaymentDto: CreatePaymentDto): Promise<Payment> {
-    // @GetUser() user:User
-    this.logger.verbose(`User creating a new board. 
-      Payload: ${JSON.stringify(createPaymentDto)} `); // ${user.username}
-    return this.paymentsService.createPayment(createPaymentDto); //, user
+  @Get()
+  findAll(): Promise<Payment[]> {
+    this.logger.verbose(`User trying to get all payments`);
+    return this.paymentsService.findAll();
   }
 
   @Get('/:id')
-  getPaymentById(@Param('id') id: number): Promise<Payment> {
-    return this.paymentsService.getPaymentById(id);
+  findOne(@Param('id') id: number): Promise<Payment> {
+    return this.paymentsService.findOne(id);
+  }
+
+  @Patch('/:id')
+  update(
+    @Param('id') id: string,
+    @Body() updatePaymentDto: UpdatePaymentDto,
+  ): Promise<Payment> {
+    console.log(typeof id);
+    // console.log('controller : ' + updatePaymentDto);
+    return this.paymentsService.update(+id, updatePaymentDto);
   }
 
   @Delete('/:id')
-  deletePayment(
+  delete(
     @Param('id', ParseIntPipe) id,
     //@GetUser() user:User
   ): Promise<void> {
-    return this.paymentsService.deletePayment(id); // , user
-  }
-
-  @Patch('/:id/status')
-  updateBoardStatus(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('status', PaymentStatusValidationPipe) status: PaymentStatus,
-  ) {
-    return this.paymentsService.updateBoardStatus(id); // , status
+    return this.paymentsService.delete(id); // , user
   }
 }
-
-/*
-  @Get()
-  getAllBoard(@GetUser() user: Users): Promise<Payment[]> {
-    this.logger.verbose(
-      `User ${user.firstName} ${user.lastName} trying to get all payments`,
-    );
-    return this.boardsService.getAllPayments(user);
-  }
-*/

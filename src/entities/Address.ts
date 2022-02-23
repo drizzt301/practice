@@ -24,7 +24,11 @@ export class Address {
   @Column('character varying', { name: 'apartment_address', length: 200 })
   apartmentAddress: string;
 
-  @Column('character varying', { name: 'etc_address', length: 200 })
+  @Column('character varying', {
+    name: 'etc_address',
+    length: 200,
+    nullable: true,
+  })
   etc: string;
 
   @Column('character varying', {
